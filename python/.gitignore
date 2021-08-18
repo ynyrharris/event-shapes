@@ -1,0 +1,6 @@
+# Python gitignores
+*.cpp
+*.egg-info
+
+*~*
+.*
