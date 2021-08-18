@@ -1,0 +1,4 @@
+# Specific files to exclude while testing
+EventShapes/Example.h
+Root/Example.cxx
+Root/PlotFromTree.C
