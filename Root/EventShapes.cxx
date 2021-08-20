@@ -21,29 +21,15 @@ EventShapes::EventShapes(const std::vector<std::vector<float>>& momenta)
 	  m_thrust_major_axis(nullptr),
 	  m_thrust_minor_axis(nullptr) {
 
-	std::cout << "Printing raw momentum vectors from constructor" << std::endl;
-	for (auto& p : momenta) {
-		std::cout << p[0] << ", " << p[1] << std::endl;
-	}
-
 	m_three_momenta.reserve(momenta.size());
 	for (auto& p : momenta) {
-		// m_three_momenta.push_back(p.Vect());
 		TVector3 tvector;
 		if (p.size() ==  2) {
-			std::cout << "Size of momentum vector is 2" << std::endl;
 			tvector = TVector3(p[0], p[1], 0.);
 		} else {
 			tvector = TVector3(p[0], p[1], p[2]);
 		}
 		m_three_momenta.push_back(tvector);
-	}
-
-	for (unsigned int i = 0; i < m_three_momenta.size(); i++) {
-		std::cout << m_three_momenta[i][0]
-		<< ", " << m_three_momenta[i][1]
-		<< ", " << m_three_momenta[i][2]
-		<< std::endl;
 	}
 
 	m_ntracks = m_three_momenta.size();
