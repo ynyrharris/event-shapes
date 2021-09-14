@@ -11,12 +11,13 @@
 // ClassImp(EventShapes)
 
 EventShapes::EventShapes()
-	: m_thrust_axis(nullptr),
+	: ndims(2),
+	  m_thrust_axis(nullptr),
 	  m_thrust_major_axis(nullptr),
 	  m_thrust_minor_axis(nullptr) {}
 
 EventShapes::EventShapes(const std::vector<std::vector<float>>& momenta) 
-	: /*m_four_momenta(momenta),*/
+	: ndims(2),
 	  m_thrust_axis(nullptr),
 	  m_thrust_major_axis(nullptr),
 	  m_thrust_minor_axis(nullptr) {
@@ -26,14 +27,16 @@ EventShapes::EventShapes(const std::vector<std::vector<float>>& momenta)
 		TVector3 tvector;
 		if (p.size() ==  2) {
 			tvector = TVector3(p[0], p[1], 0.);
+			ndims = 2;
 		} else {
 			tvector = TVector3(p[0], p[1], p[2]);
+			ndims = 3;
 		}
 		m_three_momenta.push_back(tvector);
 	}
 
 	m_ntracks = m_three_momenta.size();
-	m_min_ntracks = 2;
+	m_min_ntracks = ndims;
 
 	m_randg = TRandom{};
 }
@@ -453,17 +456,28 @@ void EventShapes::calcLinSph() {
 	});
 
 	// Compute sphericity variables and set class data members
-	double S = (eigenvalues[1] + eigenvalues[2]) * 3./2.;
-	double A = eigenvalues[2] * 3./2.;
-	double C = (eigenvalues[0] * eigenvalues[1]
-				+ eigenvalues[0] * eigenvalues[2]
-				+ eigenvalues[1] * eigenvalues[2]) * 3.;
-	double D = 27. * eigenvalues[0] * eigenvalues[1] * eigenvalues[2];
 
-	m_lin_spher_S = S;
-	m_lin_spher_A = A;
-	m_lin_spher_C = C;
-	m_lin_spher_D = D;
+	if (ndims == 3) {
+		double S = (eigenvalues[1] + eigenvalues[2]) * 3./2.;
+		double A = eigenvalues[2] * 3./2.;
+		double C = (eigenvalues[0] * eigenvalues[1]
+					+ eigenvalues[0] * eigenvalues[2]
+					+ eigenvalues[1] * eigenvalues[2]) * 3.;
+		double D = 27. * eigenvalues[0] * eigenvalues[1] * eigenvalues[2];
+
+		m_lin_spher_S = S;
+		m_lin_spher_A = A;
+		m_lin_spher_C = C;
+		m_lin_spher_D = D;
+
+	} else if (ndims == 2) {
+		double S = eigenvalues[1] * 2;
+		double C = eigenvalues[0] * eigenvalues[1] * 4;
+
+		m_lin_spher_S = S;
+		m_lin_spher_C = C;
+
+	}
 
 	// std::cout << "New event:" << std::endl;
 	// std::cout << "S = " << m_lin_spher_S << std::endl;

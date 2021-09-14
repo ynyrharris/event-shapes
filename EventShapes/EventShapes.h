@@ -52,6 +52,7 @@ class EventShapes : public TObject {
 		std::vector<TVector3> m_three_momenta;
 		unsigned int m_ntracks;
 		unsigned int m_min_ntracks;
+		unsigned int ndims;
 
 		TVector3* m_thrust_axis;
 		TVector3* m_thrust_major_axis;
