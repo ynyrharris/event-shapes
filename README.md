@@ -59,7 +59,10 @@ It has a similar geometrical interpretation as the original tensor, as well as t
 The normalisation provides that $`\lambda_1 + \lambda_2 + \lambda_3 = 1`$.
 
 Sphericity event shapes are constructed from the eigenvalues.
-Sphericity itself is defined as
+
+### 3d
+
+In three dimensions, sphericity itself is defined as
 ```math
 S = \frac{3}{2}(\lambda_2 + \lambda_3).
 ```
@@ -81,6 +84,20 @@ C = 3(\lambda_1 \lambda_2 + \lambda_1 \lambda_3 + \lambda_2\lambda_3),\\
 D = 27\lambda_1 \lambda_2 \lambda_3.
 ```
 Both of these quantities take values in $`0 \leq C, D \leq 1`$.
+
+### 2d
+
+Two dimensional sphericity values are defined to have the same interpretation as their three dimensional counterparts.
+Since $`\lambda_3 = 0`$ in two dimensions, we have only $`\lambda_1`$ and $`\lambda_2`$ to work with.
+
+The sphericity scalar - quantifying the amount of activity orthogonal to the direction of greatest energy flow - is proportional to the sum of the $`d - 1`$ smallest eigenvalues, thus $`S = 2\lambda_2`$.
+
+As all input vectors here are in a plane, there is no aplanar activity, and thus no notion of aplanarity.
+
+The analog to the three dimensional 3-jet structure can be defined as $`C = 4\lambda_1 \lambda_2`.
+The analog of three-dimensional 4-jet structure $`D`$ is the same as for the 3-jet structure.
+
+The normalisation factor in each case arranges that $`0 < X < 1`$.
 
 
 ## Comparison between thrust and sphericity-based Event Shapes
