@@ -94,7 +94,7 @@ The sphericity scalar - quantifying the amount of activity orthogonal to the dir
 
 As all input vectors here are in a plane, there is no aplanar activity, and thus no notion of aplanarity.
 
-The analog to the three dimensional 3-jet structure can be defined as $`C = 4\lambda_1 \lambda_2`.
+The analog to the three dimensional 3-jet structure can be defined as $`C = 4\lambda_1 \lambda_2`$.
 The analog of three-dimensional 4-jet structure $`D`$ is the same as for the 3-jet structure.
 
 The normalisation factor in each case arranges that $`0 < X < 1`$.
