@@ -24,9 +24,9 @@ target_link_libraries( EventShapesLib
 )
 
 # Add executable for testing the C++
-add_executable(  ${CMAKE_CURRENT_SOURCE_DIR}/tests/main.cxx )
-target_include_directories( MyTest PUBLIC "${PROJECT_BINARY_DIR}" )
-target_link_libraries( MyTest PUBLIC EventShapesLib )
+add_executable( estest ${CMAKE_CURRENT_SOURCE_DIR}/tests/main.cxx )
+target_include_directories( estest PUBLIC "${PROJECT_BINARY_DIR}" )
+target_link_libraries( estest PUBLIC EventShapesLib )
 
 install(TARGETS EventShapesLib DESTINATION ${PROJECT_BINARY_DIR}/lib)
 install(FILES EventShapes/EventShapes.h DESTINATION ${PROJECT_BINARY_DIR}/include)
