@@ -8,7 +8,7 @@
 #include <iostream>
 #include <math.h>
 
-// ClassImp(EventShapes)
+ClassImp(EventShapes)
 
 EventShapes::EventShapes()
 	: ndims(2),
