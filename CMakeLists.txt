@@ -1,6 +1,7 @@
 
 # Find external packages
 find_package( ROOT COMPONENTS Core Matrix MathCore Physics)
+find_package( Eigen3 3.3 REQUIRED NO_MODULE )
 
 ROOT_GENERATE_DICTIONARY( G__EventShapesLib
 	EventShapes/EventShapes.h
@@ -19,7 +20,13 @@ target_include_directories( EventShapesLib PUBLIC
 
 target_link_libraries( EventShapesLib
 	${ROOT_LIBRARIES}
+	Eigen3::Eigen
 )
+
+# Add executable for testing the C++
+add_executable(  ${CMAKE_CURRENT_SOURCE_DIR}/tests/main.cxx )
+target_include_directories( MyTest PUBLIC "${PROJECT_BINARY_DIR}" )
+target_link_libraries( MyTest PUBLIC EventShapesLib )
 
 install(TARGETS EventShapesLib DESTINATION ${PROJECT_BINARY_DIR}/lib)
 install(FILES EventShapes/EventShapes.h DESTINATION ${PROJECT_BINARY_DIR}/include)
