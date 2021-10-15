@@ -13,7 +13,7 @@ add_library( EventShapesLib SHARED
 )
 
 target_include_directories( EventShapesLib PUBLIC
-	${CMAKE_SOURCE_DIR}/EventShapes
+	${CMAKE_CURRENT_SOURCE_DIR}
 	${ROOT_INCLUDE_DIRS}
 )
 
