@@ -1,14 +1,7 @@
 
-message("In python/CMakeLists.txt")
-
-# Find external packages
-find_package( ROOT COMPONENTS Core Matrix MathCore Physics)
 
 # Find Python
 find_package(Python3 COMPONENTS Interpreter Development)
-
-message("Found Python? ${Python3_FOUND}")
-message("Python version: ${Python3_VERSION}")
 
 # Set variables
 set(SETUP_PY_IN "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in")

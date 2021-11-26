@@ -8,8 +8,6 @@
 
 using namespace Eigen;
 
-ClassImp(EventShapes)
-
 EventShapes::EventShapes()
 	: ndims(2),
 	  m_thrust_axis(nullptr),

@@ -75,7 +75,6 @@ class EventShapes : public TObject {
 		double m_lin_spher_C; // 3 jet structure
 		double m_lin_spher_D; // 4 jet structure
 
-		ClassDef(EventShapes, 1)
 };
 
 #endif
