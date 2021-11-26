@@ -20,6 +20,6 @@ add_custom_command(OUTPUT ${PY_OUTPUT}
 add_custom_target(event_shapes ALL DEPENDS ${PY_OUTPUT})
 
 install(CODE "execute_process(
-		COMMAND ${Python3_EXECUTABLE} -m pip install --use-feature=in-tree-build ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND ${Python3_EXECUTABLE} -m pip install ${CMAKE_CURRENT_BINARY_DIR}
 	)"
 )

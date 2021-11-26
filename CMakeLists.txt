@@ -13,6 +13,6 @@ find_package( Eigen3 3.3 REQUIRED NO_MODULE )
 # Select the build scheme based on user's configuration
 if (PYTHON_SETUP AND (NOT CXX_SETUP))
 	include(cmake/python.cmake)
-elseif (CXX_SETUP AND (NOT PYTHON_SETUP))
+elseif (CXX_SETUP)
 	include(cmake/cxx.cmake)
 endif()
