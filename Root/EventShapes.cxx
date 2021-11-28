@@ -182,27 +182,19 @@ const std::pair<Vector3f, double> EventShapes::calcT_orig(const std::vector<Vect
 	double best_thrust = 0.;
 
 	// Start from multiple random initial axes
-	for (unsigned int i = 0; i < pow(pvec.size(), 2); i++) {
+	for (unsigned int i = 0; i < pvec.size(); i++) {
 
 		double x, y, z;
 		double r = 1.;
 		m_randg.Sphere(x, y, z, r);
 		Vector3f init (x, y, z);
 
-		// Vector3f init (m_randg.Rndm(), m_randg.Rndm(), m_randg.Rndm());
-		Vector3f axis (init);
-
 		// Iterate the axis to local maximum
-		double diff = 999.;
-		while (diff > 1e-5) {
-			Vector3f foo(0, 0, 0);
-			for (const auto& p : pvec) {
-				axis.dot(p) > 0 ? foo += p : foo -= p;
-			}
-			foo /= foo.norm();
-			diff = (axis - foo).norm();
-			axis = foo;
+		Vector3f axis (0, 0, 0);
+		for (const auto& p : pvec) {
+			init.dot(p) > 0 ? axis += p : axis -= p;
 		}
+		axis.normalize();
 
 		// Keep the axis if it increases the thrust value
 		double thrust = calcThrustValue(pvec, axis);
