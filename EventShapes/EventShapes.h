@@ -46,6 +46,9 @@ class EventShapes : public TObject {
 		double get_lin_spher_C() { return m_lin_spher_C; }
 		double get_lin_spher_D() { return m_lin_spher_D; }
 
+		// Longest Vector Sum problem methods
+		void lvs_t();
+
 	private:
 		TRandom m_randg;
 		// std::vector<TLorentzVector> m_four_momenta;
@@ -74,6 +77,17 @@ class EventShapes : public TObject {
 		double m_lin_spher_A;
 		double m_lin_spher_C; // 3 jet structure
 		double m_lin_spher_D; // 4 jet structure
+
+		// Longest Vector Sum problem data
+		Eigen::Vector3f* m_lvs_axis;
+		Eigen::Vector3f* m_lvs_major_axis;
+		Eigen::Vector3f* m_lvs_minor_axis;
+
+		double m_lvs_t;
+		double m_lvs_tmajor;
+		double m_lvs_tminor;
+		double m_lvs_obl;
+		double m_lvs_brd;
 
 };
 

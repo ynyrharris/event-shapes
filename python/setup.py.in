@@ -17,6 +17,7 @@ extensions = [
 		sources=[
 			'${CMAKE_CURRENT_SOURCE_DIR}/event_shapes.pyx',
 			'${CMAKE_CURRENT_SOURCE_DIR}/../Root/EventShapes.cxx',
+			'${CMAKE_CURRENT_SOURCE_DIR}/../Root/Thrust.cxx',
 		],
 		language='c++',
 		extra_compile_args=['-std=c++17'],

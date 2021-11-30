@@ -52,3 +52,27 @@ cdef class EventShapes:
 	@property
 	def sph_D(self):
 		return self._EventShapes.m_lin_spher_D
+
+
+	def calc_lvs_t(self):
+		self._EventShapes.lvs_t()
+
+	@property
+	def lvs_t(self):
+		return self._EventShapes.m_lvs_t
+
+	@property
+	def lvs_tmajor(self):
+		return self._EventShapes.m_lvs_tmajor
+
+	@property
+	def lvs_tminor(self):
+		return self._EventShapes.m_lvs_tminor
+
+	@property
+	def lvs_obl(self):
+		return self._EventShapes.m_lvs_obl
+
+	@property
+	def lvs_brd(self):
+		return self._EventShapes.m_lvs_brd

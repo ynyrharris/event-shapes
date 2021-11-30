@@ -15,3 +15,10 @@ cdef extern from "../EventShapes/EventShapes.h":
 		double m_lin_spher_A
 		double m_lin_spher_C
 		double m_lin_spher_D
+
+		void lvs_t() except +
+		double m_lvs_t
+		double m_lvs_tmajor
+		double m_lvs_tminor
+		double m_lvs_obl
+		double m_lvs_brd

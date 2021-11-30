@@ -9,7 +9,9 @@ find_package( Eigen3 3.3 REQUIRED NO_MODULE )
 #)
 
 add_library( EventShapesLib SHARED
-	Root/EventShapes.cxx EventShapes/EventShapes.h
+	Root/EventShapes.cxx
+	Root/Thrust.cxx
+	EventShapes/EventShapes.h
 #	G__EventShapesLib.cxx
 )
 
