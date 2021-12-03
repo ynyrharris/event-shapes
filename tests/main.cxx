@@ -66,6 +66,28 @@ int test_example_eventshapes(unsigned int ndims = 2) {
     return 0;
 }
 
+
+int test_lvs() {
+    std::cout << "Running LVS tests" << std::endl;
+
+    EventShapes es;
+
+    std::vector<std::vector<float>> vs;
+    vs.push_back({0., 0., 1.});
+    vs.push_back({0., 0.5, 1.});
+    vs.push_back({4., 1.2, 0.1});
+    vs.push_back({2., 1., -3.});
+    vs.push_back({-1, -2, 4});
+    es = EventShapes(vs, 3);
+
+    es.calc_all();
+    std::cout << "Trad thrust: " << es.get_thrust() << std::endl;
+
+    es.lvs_t();
+
+    return 0;
+}
+
 int main() {
 
     std::cout << "Hello, World!" << std::endl;
@@ -75,6 +97,8 @@ int main() {
 
     test_example_eventshapes(3);
     test_example_eventshapes(2);
+
+    test_lvs();
 
     return 0;
 }
