@@ -5,8 +5,15 @@
 
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 using namespace Eigen;
+
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
+
 
 int test_example_eigen() {
     std::cout << "Running Eigen example" << std::endl;
@@ -80,10 +87,61 @@ int test_lvs() {
     vs.push_back({-1, -2, 4});
     es = EventShapes(vs, 3);
 
+    auto t1 = high_resolution_clock::now();
     es.calc_all();
+    auto t2 = high_resolution_clock::now();
     std::cout << "Trad thrust: " << es.get_thrust() << std::endl;
+    auto ms = duration<double, std::milli>(t2 - t1);
+    std::cout << "Trad thrust took " << ms.count() << "ms" << std::endl;
 
+    t1= high_resolution_clock::now();
     es.lvs_t();
+    t2 = high_resolution_clock::now();
+    ms = duration<double, std::milli>(t2 - t1);
+    std::cout << "LVS thrust took " << ms.count() << "ms" << std::endl;
+
+
+
+    float epsilon = 0.05;
+    vs.clear();
+    vs.push_back({1., epsilon, 0.});
+    vs.push_back({0., 1., epsilon});
+    vs.push_back({epsilon, 0., 1.});
+    es = EventShapes(vs, 3);
+
+    t1 = high_resolution_clock::now();
+    es.calc_all();
+    t2 = high_resolution_clock::now();
+    std::cout << "Trad thrust: " << es.get_thrust() << std::endl;
+    ms = duration<double, std::milli>(t2 - t1);
+    std::cout << "Trad thrust took " << ms.count() << "ms" << std::endl;
+
+    t1= high_resolution_clock::now();
+    es.lvs_t();
+    t2 = high_resolution_clock::now();
+    ms = duration<double, std::milli>(t2 - t1);
+    std::cout << "LVS thrust took " << ms.count() << "ms" << std::endl;
+
+    vs.clear();
+    for (unsigned int i = 0; i < 30; i++) {
+        Eigen::Vector3f v = Eigen::Vector3f::Random();
+        vs.push_back({v.x(), v.y(), v.z()});
+    }
+
+    es = EventShapes(vs, 3);
+
+    t1 = high_resolution_clock::now();
+    es.calc_all();
+    t2 = high_resolution_clock::now();
+    std::cout << "Trad thrust: " << es.get_thrust() << std::endl;
+    ms = duration<double, std::milli>(t2 - t1);
+    std::cout << "Trad thrust took " << ms.count() << "ms" << std::endl;
+
+    t1= high_resolution_clock::now();
+    es.lvs_t();
+    t2 = high_resolution_clock::now();
+    ms = duration<double, std::milli>(t2 - t1);
+    std::cout << "LVS thrust took " << ms.count() << "ms" << std::endl;
 
     return 0;
 }

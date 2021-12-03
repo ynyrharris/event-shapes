@@ -16,28 +16,10 @@ void m1_base() {
 
 
 void k2_base(std::vector<Eigen::Vector3f>& V,
-	const std::vector<Eigen::Vector3f>& X,
-	unsigned int m
+	const std::vector<Eigen::Vector3f>& X, unsigned int m
 	) {
 
-	// Construct the linear span E of the plane
-	// e1 = unit vector in the plane othogonal to gm
-	// e2 = e1 x gm
-
-	// Construct unit vectors orthogonal to the vectors of X in G
-	// gi = xi - (zm xi) zm
-	// l(gi) = gm x gi
-	// r(gi) = -l(gi)
-	// L = {li, ri}
-
-	// Sort the Li by angle from e1
-	// cos(theta(Li, e1)) = Li e1
-
-	// Take the bisectors of rays as representatives of A
-	// vi = (v_{i + 1} + v_i).normalize()
-
-	// Return the bisectors of rays as the solution to the problem in k = 2
-
+	// Solve the problem in the plane orthogonal to X[m]
 	Eigen::Vector3f zm = X[m].normalized();
 
 	// Construct the linear span E of the plane orthogonal to X[m], H(m)
@@ -54,8 +36,8 @@ void k2_base(std::vector<Eigen::Vector3f>& V,
 		Eigen::Vector3f li = zm.cross(hi);
 		Eigen::Vector3f ri = -li;
 
-		L.push_back(li.normalized());
-		L.push_back(ri.normalized());
+		L.push_back(li);
+		L.push_back(ri);
 	}
 
 	// Sort the rays by angle from e1
@@ -69,19 +51,10 @@ void k2_base(std::vector<Eigen::Vector3f>& V,
 		return phi_a < phi_b;
 	});
 
-	std::cout << "Check sorting of " << L.size() << " elements:" << std::endl;
-	for (auto l : L) {
-		double phi = acos(l.dot(e1));
-		phi = zm.dot(e1.cross(l)) > 0. ? phi : phi + M_PI;
-		std::cout << "l dot e1: " << phi << std::endl;
-	}
-
-	// Take the bisectors of rays as representatives of the areas
+	// Take the bisectors of rays as representatives of the regions
 	unsigned int L_size = L.size();
 	for (unsigned int i = 0; i < L_size; i++) {
-		std::cout << "Indices: " << (i + 1) % L_size << ", " << i << std::endl;
 		Eigen::Vector3f vi = (L[(i + 1) % L_size] + L[i]) / 2.;
-		vi.normalize();
 		V.push_back(vi + 0.000001 * zm);
 		V.push_back(vi - 0.000001 * zm);
 	}
@@ -93,25 +66,12 @@ void remove_redundant(std::vector<Eigen::Vector3f>& V,
 	unsigned int m
 	) {
 	// Remove all but one vectors belonging to the same region.
-	// Has to be done to prevent making a list 2^n elements long!
+	// Has to be done to prevent making a list 2^n elements long.
 
-	// Vectors are equivalent when
+	// Vectors (belong to same region)/(are equivalent) when
 	// (u xi) (u' xi) > 0 for all i
 
-    // vector<uint> remove_indices
-	// for u in v, i: 0 --> n
-	//     for u' in v, j: i + 1 --> n
-	//         if u' = u continue
-	//
-	//         for xi in x
-	//             if (u xi) (u' xi) < 0
-	//                 remove_indices(j)
-	//                 break
-
-	std::vector<unsigned int> remove_indices;
-	unsigned int V_size = V.size();
 	for (unsigned int i = 0; i < V.size() - 1; i++) {
-		std::cout << "V size at " << i << ": " << V.size() << std::endl;
 		for (unsigned int j = i + 1; j < V.size(); j++) {
 
 			bool redundant = true;
@@ -122,6 +82,7 @@ void remove_redundant(std::vector<Eigen::Vector3f>& V,
 				}
 			}
 
+			// Remove V[j] when it is equivalent to V[i]
 			if (redundant) {
 				V.erase(V.begin() + j);
 				j--;
@@ -144,7 +105,6 @@ double calc_t(const std::vector<Eigen::Vector3f>& V,
 	const std::vector<Eigen::Vector3f>& X) {
 
 	double t = 0.;
-	unsigned int i = 0;
 	for (const Eigen::Vector3f& v : V) {
 		double p = 0.;
 		double q = 0.;
@@ -162,12 +122,9 @@ double calc_t(const std::vector<Eigen::Vector3f>& V,
 		}
 
 		double res = p / q;
-		std::cout << "Thrust axis w.r.t. region "  << i << ": " << res << std::endl;
 		if (res > t) {
-			std::cout << "New best thrust axis: " << res << std::endl;
 			t = res;
 		}
-		i++;
 	}
 
 	return t;
@@ -183,18 +140,9 @@ void EventShapes::lvs_t() {
 	// Variables to modify:
 	std::vector<Eigen::Vector3f> V;
 
-	// for m in range(X)
-	// solve problem P(span(xm), m):
-	// m = 1: m1_base()
-	// k2_base()
-	// split_region()
-	// remove_redundant()
-
 	for (unsigned int m = 0; m < X.size(); m++) {
 
-		G.push_back(X[m]);
-
-		// Apply m = 1 case when G is still empty
+		// Apply initialiser case
 		if (m == 0) {
 			Eigen::Vector3f q = Eigen::Vector3f::Random();
 			q.normalize();
@@ -208,7 +156,7 @@ void EventShapes::lvs_t() {
 
 	double t = calc_t(V, X);
 
-	std::cout << "LSV thrust: " << t << std::endl;
+	std::cout << "LVS thrust: " << t << std::endl;
 
 	return;
 }

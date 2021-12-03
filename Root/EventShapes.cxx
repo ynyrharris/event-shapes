@@ -182,7 +182,7 @@ const std::pair<Vector3f, double> EventShapes::calcT_orig(const std::vector<Vect
 	double best_thrust = 0.;
 
 	// Start from multiple random initial axes
-	for (unsigned int i = 0; i < 100; i++) {
+	for (unsigned int i = 0; i < pow(pvec.size(), 2); i++) {
 
 		double x, y, z;
 		double r = 1.;
@@ -507,11 +507,11 @@ void EventShapes::calcLinSph() {
 
 void EventShapes::calc_all() {
 	calcThrust();
-	calcThrustMajor();
-	calcThrustMinor();
-	calcOblateness();
-	calcBrd();
-	calcLinSph();
+	// calcThrustMajor();
+	// calcThrustMinor();
+	// calcOblateness();
+	// calcBrd();
+	// calcLinSph();
 }
 
 EventShapes::~EventShapes() {
