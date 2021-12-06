@@ -134,7 +134,7 @@ void split_region() {
 }
 
 
-double calc_t(const std::vector<Eigen::Vector3f>& V,
+double calc_lvs_t(const std::vector<Eigen::Vector3f>& V,
 	const std::vector<Eigen::Vector3f>& X) {
 
 	double t = 0.;
@@ -166,7 +166,7 @@ double calc_t(const std::vector<Eigen::Vector3f>& V,
 
 void EventShapes::lvs_t() {
 
-	std::vector<Eigen::Vector3f> X = m_three_momenta;
+	std::vector<Eigen::Vector3f> X = m_momenta;
 
 	// Variables to modify:
 	std::vector<Eigen::Vector3f> V;
@@ -186,7 +186,7 @@ void EventShapes::lvs_t() {
 		}
 	}
 
-	double t = calc_t(V, X);
+	double t = calc_lvs_t(V, X);
 	m_lvs_t = t;
 	m_lvs_lenV = V.size();
 

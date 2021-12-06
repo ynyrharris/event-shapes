@@ -39,10 +39,12 @@ int test_example_eventshapes(unsigned int ndims = 2) {
     EventShapes es;
 
     if (ndims == 3) {
-        float epsilon = 0.05;
-        vs.push_back({1., epsilon, 0.});
-        vs.push_back({0., 1., epsilon});
-        vs.push_back({epsilon, 0., 1.});
+
+        // srand(12345789);
+        for (unsigned int i = 0; i < 30; i++) {
+            Eigen::Vector3f v = Eigen::Vector3f::Random();
+            vs.push_back({v.x(), v.y(), v.z()});
+        }
 
         es = EventShapes(vs, 3);
 
@@ -67,6 +69,9 @@ int test_example_eventshapes(unsigned int ndims = 2) {
     std::cout << "A: " << es.get_lin_spher_A() << std::endl;
     std::cout << "C: " << es.get_lin_spher_C() << std::endl;
     std::cout << "D: " << es.get_lin_spher_D() << std::endl;
+
+    es.lvs_t();
+    std::cout << "LVS thrust: " << es.m_lvs_t << std::endl;
 
 
     std::cout << std::endl;
