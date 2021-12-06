@@ -88,6 +88,7 @@ class EventShapes : public TObject {
 		double m_lvs_tminor;
 		double m_lvs_obl;
 		double m_lvs_brd;
+		unsigned int m_lvs_lenV;
 
 };
 

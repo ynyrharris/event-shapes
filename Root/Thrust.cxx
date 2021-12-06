@@ -31,10 +31,13 @@ void k2_base(std::vector<Eigen::Vector3f>& V,
 
 	// Construct unit vectors orthogonal to the vectors of X in H(m)
 	std::vector<Eigen::Vector3f> L;
+	L.reserve(2 * (m + 1));
+	Eigen::Vector3f hi, li, ri;
+
 	for (unsigned int i = 0; i < m; i++) {
-		Eigen::Vector3f hi = X[i] - (zm.dot(X[i])) * zm;
-		Eigen::Vector3f li = zm.cross(hi);
-		Eigen::Vector3f ri = -li;
+		hi = X[i] - (zm.dot(X[i])) * zm;
+		li = zm.cross(hi);
+		ri = -li;
 
 		L.push_back(li);
 		L.push_back(ri);
@@ -53,10 +56,39 @@ void k2_base(std::vector<Eigen::Vector3f>& V,
 
 	// Take the bisectors of rays as representatives of the regions
 	unsigned int L_size = L.size();
-	for (unsigned int i = 0; i < L_size; i++) {
-		Eigen::Vector3f vi = (L[(i + 1) % L_size] + L[i]) / 2.;
-		V.push_back(vi + 0.000001 * zm);
-		V.push_back(vi - 0.000001 * zm);
+	Eigen::Vector3f vi;
+	std::vector<Eigen::Vector3f> V_extra;
+	V_extra.reserve(L_size * 2);
+
+	for (unsigned int i = 0; i < L_size - 1; i++) {
+		vi = L[(i + 1) % L_size] + L[i];
+
+		auto check_redundance = [&] (const Eigen::Vector3f& v) {
+			for (unsigned int j = 0; j < V.size(); j++) {
+
+				bool redundant = true;
+				for (unsigned int k = 0; k < m; k++) {
+					if (v.dot(X[k]) * V[j].dot(X[k]) < std::numeric_limits<float>::epsilon()) {
+						redundant = false;
+						break;
+					}
+				}
+		
+				if (redundant) {
+					V.erase(V.begin() + j);
+					j--;
+				}
+			}
+		};
+
+		check_redundance(vi);
+
+		V_extra.push_back(vi + 1e-5 * zm);
+		V_extra.push_back(vi - 1e-5 * zm);
+	}
+
+	for (auto v : V_extra) {
+		V.push_back(v);
 	}
 }
 
@@ -76,7 +108,7 @@ void remove_redundant(std::vector<Eigen::Vector3f>& V,
 
 			bool redundant = true;
 			for (unsigned int k = 0; k < m; k++) {
-				if (V[i].dot(X[k]) * V[j].dot(X[k]) < 0) {
+				if (V[i].dot(X[k]) * V[j].dot(X[k]) < 1e-7) {
 					redundant = false;
 					break;
 				}
@@ -86,6 +118,7 @@ void remove_redundant(std::vector<Eigen::Vector3f>& V,
 			if (redundant) {
 				V.erase(V.begin() + j);
 				j--;
+				continue;
 			}
 		}
 	}
@@ -133,12 +166,11 @@ double calc_t(const std::vector<Eigen::Vector3f>& V,
 
 void EventShapes::lvs_t() {
 
-	std::cout << "Beginning LVS calculation of thrust" << std::endl;
-
 	std::vector<Eigen::Vector3f> X = m_three_momenta;
 
 	// Variables to modify:
 	std::vector<Eigen::Vector3f> V;
+	V.reserve(pow(X.size(), 2));
 
 	for (unsigned int m = 0; m < X.size(); m++) {
 
@@ -150,13 +182,15 @@ void EventShapes::lvs_t() {
 			V.push_back(-q);
 		} else {
 			k2_base(V, X, m);
-			remove_redundant(V, X, m);
+			// remove_redundant(V, X, m);
 		}
 	}
 
 	double t = calc_t(V, X);
+	m_lvs_t = t;
+	m_lvs_lenV = V.size();
 
-	std::cout << "LVS thrust: " << t << std::endl;
+	// std::cout << "LVS thrust: " << t << std::endl;
 
 	return;
 }
