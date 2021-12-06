@@ -244,7 +244,7 @@ int main() {
 
     // test_lvs();
 
-    benchmark_lvs();
+    // benchmark_lvs();
 
     return 0;
 }
