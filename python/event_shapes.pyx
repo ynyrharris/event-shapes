@@ -8,14 +8,20 @@ cdef class EventShapes:
 	# Hold a C++ instance of the class we're wrapping
 	cdef c.EventShapes* _EventShapes
 
-	def __cinit__(self, momenta):
-		self._EventShapes = new c.EventShapes(momenta)
+	def __cinit__(self, momenta, ndims=2):
+		self._EventShapes = new c.EventShapes(momenta, ndims)
 
 	def __dealloc__(self):
 		del self._EventShapes
 
 	def calc_all(self):
 		self._EventShapes.calc_all()
+
+	def calc_thrusts(self):
+		self._EventShapes.calc_thrusts()
+
+	def calc_sphericities(self, r):
+		self._EventShapes.calc_sphericities(r)
 
 	@property
 	def thrust(self):
@@ -39,19 +45,19 @@ cdef class EventShapes:
 	
 	@property
 	def sph_S(self):
-		return self._EventShapes.m_lin_spher_S
+		return self._EventShapes.m_spher_S
 	
 	@property
 	def sph_A(self):
-		return self._EventShapes.m_lin_spher_A
+		return self._EventShapes.m_spher_A
 	
 	@property
 	def sph_C(self):
-		return self._EventShapes.m_lin_spher_C
+		return self._EventShapes.m_spher_C
 	
 	@property
 	def sph_D(self):
-		return self._EventShapes.m_lin_spher_D
+		return self._EventShapes.m_spher_D
 
 
 	def calc_lvs_t(self):

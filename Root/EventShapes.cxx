@@ -19,10 +19,10 @@ EventShapes::EventShapes()
 	  m_thrust_minor(-1.),
 	  m_oblateness(-1.),
 	  m_broadening(-1.),
-	  m_lin_spher_S(-1),
-	  m_lin_spher_A(-1),
-	  m_lin_spher_C(-1.),
-	  m_lin_spher_D(-1.),
+	  m_spher_S(-1),
+	  m_spher_A(-1),
+	  m_spher_C(-1.),
+	  m_spher_D(-1.),
 	  m_lvs_t(-1.),
 	  m_lvs_tmajor(-1.),
 	  m_lvs_tminor(-1.),
@@ -40,10 +40,10 @@ EventShapes::EventShapes(const std::vector<std::vector<float>>& momenta, unsigne
 	  m_thrust_minor(-1.),
 	  m_oblateness(-1.),
 	  m_broadening(-1.),
-	  m_lin_spher_S(-1),
-	  m_lin_spher_A(-1),
-	  m_lin_spher_C(-1.),
-	  m_lin_spher_D(-1.),
+	  m_spher_S(-1),
+	  m_spher_A(-1),
+	  m_spher_C(-1.),
+	  m_spher_D(-1.),
 	  m_lvs_t(-1.),
 	  m_lvs_tmajor(-1.),
 	  m_lvs_tminor(-1.),
@@ -103,7 +103,7 @@ const std::pair<Vector3f, double> EventShapes::tradThrust(const std::vector<Vect
 	double axis_t = 0.;
 
 	// Start from multiple random initial axes
-	float N_trials = pow(X.size(), m_ndims - 1);
+	float N_trials = pow(X.size(), m_ndims - 0.5);
 	for (unsigned int i = 0; i < N_trials; i++) {
 		Vector3f init = Vector3f::Random();
 
@@ -197,12 +197,15 @@ void EventShapes::calcThrustMinor() {
 	double thrust_minor = calc_t(m_momenta, thrust_minor_axis);
 
 	// Sanity check
-	double a_dot_b = fabs(thrust_axis.dot(thrust_major_axis));
-	double b_dot_c = fabs(thrust_major_axis.dot(thrust_minor_axis));
-	double epsilon = std::numeric_limits<float>::epsilon();
+	float a_dot_b = fabs(thrust_axis.dot(thrust_major_axis));
+	float b_dot_c = fabs(thrust_axis.dot(thrust_minor_axis));
+	float epsilon = 1e2 * std::numeric_limits<float>::epsilon();
 
 	if (a_dot_b > epsilon || b_dot_c > epsilon) {
 		std::cout << "Thrust axes not orthogonal!" << std::endl;
+		std::cout << "a_dot_b: " << a_dot_b << std::endl;
+		std::cout << "b_dot_c: " << b_dot_c << std::endl;
+		std::cout << "epsilon: " << epsilon << std::endl;
 	}
 
 	// Set class data members
@@ -315,17 +318,17 @@ void EventShapes::calcSph(float r) {
 					+ eigen_values[1] * eigen_values[0]) * 3.;
 		double D = 27. * eigen_values[2] * eigen_values[1] * eigen_values[0];
 
-		m_lin_spher_S = S;
-		m_lin_spher_A = A;
-		m_lin_spher_C = C;
-		m_lin_spher_D = D;
+		m_spher_S = S;
+		m_spher_A = A;
+		m_spher_C = C;
+		m_spher_D = D;
 
 	} else if (m_ndims == 2) {
 		double S = eigen_values[1] * 2.;
 		double C = eigen_values[1] * eigen_values[2] * 4.;
 
-		m_lin_spher_S = S;
-		m_lin_spher_C = C;
+		m_spher_S = S;
+		m_spher_C = C;
 
 	}
 
@@ -339,6 +342,20 @@ void EventShapes::calc_all() {
 	calcOblateness();
 	calcBrd();
 	calcSph(2);
+}
+
+
+void EventShapes::calc_thrusts() {
+	calcThrust();
+	calcThrustMajor();
+	calcThrustMinor();
+	calcOblateness();
+	calcBrd();
+}
+
+
+void EventShapes::calc_sphericities(float r) {
+	calcSph(r);
 }
 
 
