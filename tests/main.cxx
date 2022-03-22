@@ -40,7 +40,7 @@ int test_example_eventshapes(unsigned int ndims = 2) {
 
     if (ndims == 3) {
 
-        // srand(12345789);
+        srand(12345789);
         for (unsigned int i = 0; i < 30; i++) {
             Eigen::Vector3f v = Eigen::Vector3f::Random();
             vs.push_back({v.x(), v.y(), v.z()});
@@ -65,10 +65,10 @@ int test_example_eventshapes(unsigned int ndims = 2) {
     std::cout << "Thrust minor: " << es.get_thrust_minor() << std::endl;
     std::cout << "Oblateness: " << es.get_oblateness() << std::endl;
     std::cout << "Broadening: " << es.get_broadening() << std::endl;
-    std::cout << "S: " << es.get_lin_spher_S() << std::endl;
-    std::cout << "A: " << es.get_lin_spher_A() << std::endl;
-    std::cout << "C: " << es.get_lin_spher_C() << std::endl;
-    std::cout << "D: " << es.get_lin_spher_D() << std::endl;
+    std::cout << "S: " << es.get_spher_S() << std::endl;
+    std::cout << "A: " << es.get_spher_A() << std::endl;
+    std::cout << "C: " << es.get_spher_C() << std::endl;
+    std::cout << "D: " << es.get_spher_D() << std::endl;
 
     es.lvs_t();
     std::cout << "LVS thrust: " << es.m_lvs_t << std::endl;

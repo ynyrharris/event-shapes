@@ -103,7 +103,7 @@ const std::pair<Vector3f, double> EventShapes::tradThrust(const std::vector<Vect
 	double axis_t = 0.;
 
 	// Start from multiple random initial axes
-	float N_trials = pow(X.size(), m_ndims - 0.5);
+	float N_trials = m_ndims < 3 ? pow(X.size(), m_ndims) : 2 * pow(X.size(), m_ndims - 1);
 	for (unsigned int i = 0; i < N_trials; i++) {
 		Vector3f init = Vector3f::Random();
 
@@ -121,6 +121,66 @@ const std::pair<Vector3f, double> EventShapes::tradThrust(const std::vector<Vect
 		}
 	}
 
+	std::cout << "Thrust axis: " << axis << std::endl;
+
+	return std::pair<Vector3f, double> (axis, axis_t);
+}
+
+
+std::pair<Vector3f, double> EventShapes::pythiaThrust(const std::vector<Vector3f>& X) {
+	/*
+	 Calculate the thrust axis using the method of the Pythia 6.4 manual.
+	 https://arxiv.org/pdf/hep-ph/0603175.pdf
+
+	 The set of input vectors is sorted by momentum, and the top n
+	 of them are taken as starting axes.  Candidate thrust axes are found
+	 by iterating from these starting axes until they stop changing.
+	 The axis of greatest thrust is taken as the thrust axis.
+
+	 No guarantee that the global maximum thrust will be found, but this
+	 is a computationally practical calculation.
+	 */
+
+	// Variables to hold best thrust values
+	Vector3f axis;
+	double axis_t = 0.;
+
+	// Make a local copy of the set of input vectors to sort
+	std::vector<Vector3f> Y = X;
+	std::sort(Y.begin(), Y.end(), [&](Vector3f a, Vector3f b) {
+		return a.norm() > b.norm();
+	});
+
+	// Number of starting axes
+	unsigned int n = 4;
+
+	for (unsigned int i = 0; i < n; i++) {
+
+		// Iterate to the closest maximum thrust axis
+		double delta = 999.;
+		double epsilon = 1e-5;
+		Vector3f n0 = Y[i];
+		Vector3f nj = n0.normalized();
+
+		while (delta > std::numeric_limits<float>::epsilon()) {
+
+			Vector3f v = Vector3f::Zero();
+			for (const auto& y : Y) {
+				nj.dot(y) > 0. ? v += y : v -= y;
+			}
+			v.normalize();
+			delta = (v - nj).norm();
+			nj = v;
+		}
+
+		// Keep the axis if it increases the thrust value
+		double v_t = calc_t(X, nj);
+		if (v_t > axis_t) {
+			axis_t = v_t;
+			axis = nj;
+		}
+	}
+
 	return std::pair<Vector3f, double> (axis, axis_t);
 }
 
@@ -130,7 +190,7 @@ void EventShapes::calcThrust() {
 	 * The class member data are set with the calculated values.
 	 */
 
-	std::pair<Vector3f, double> pair = tradThrust(m_momenta);
+	std::pair<Vector3f, double> pair = pythiaThrust(m_momenta);
 
 	// Set class data members
 	if (pair.second < 0.) {
@@ -156,15 +216,25 @@ void EventShapes::calcThrustMajor() {
 
 	const Vector3f z = *m_thrust_axis;
 
-	// Calculate thrust in plane perpendicular to thrust axis proper
-	std::vector<Vector3f> G;
-	G.reserve(m_momenta.size());
+	std::pair<Vector3f, double> pair;
 
-	for (const auto& x : m_momenta) {
-		G.push_back(x - x.dot(z) * z);
+	if (m_ndims == 2) {
+		Vector3f thrust_major_axis = z.cross(Vector3f(0., 0., 1.));
+		double thrust_major_value = calc_t(m_momenta, thrust_major_axis);
+		pair = std::pair<Vector3f, double> (thrust_major_axis, thrust_major_value);
+
+	} else {
+
+		// Calculate thrust in plane perpendicular to thrust axis proper
+		std::vector<Vector3f> G;
+		G.reserve(m_momenta.size());
+
+		for (const auto& x : m_momenta) {
+			G.push_back(x - x.dot(z) * z);
+		}
+
+		pair = tradThrust(G);
 	}
-
-	std::pair<Vector3f, double> pair = tradThrust(G);
 
 	// Set class data members
 	if (pair.second < 0.) {
@@ -184,6 +254,8 @@ void EventShapes::calcThrustMinor() {
 	 * This axis is defined as being orthogonal to the thrust and 
 	 * thrust major axes.
 	 */
+
+	if (m_ndims < 3) return;
 
 	// This function depends on the thrust and thrust major axes
 	if (!m_thrust_major_axis) calcThrustMajor();
@@ -218,6 +290,8 @@ void EventShapes::calcOblateness() {
 	/* Function that calculates the oblateness about the thrust axis.
 	 */
 
+	if (m_ndims < 3) return;
+
 	// This function depends on the major and minor thrust calculations
 	if (!m_thrust_minor_axis) calcThrustMinor();
 	if (!m_thrust_minor_axis) return;
@@ -234,7 +308,7 @@ void EventShapes::calcBrd() {
 	 */
 
 	// Depends on the thrust axis
-	if (!m_thrust_axis) tradThrust(m_momenta);
+	if (!m_thrust_axis) calcThrust();
 	if (!m_thrust_axis) return;
 
 	// Alias thrust axis
