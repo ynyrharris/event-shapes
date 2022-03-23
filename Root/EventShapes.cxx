@@ -314,13 +314,20 @@ void EventShapes::calcOblateness() {
 	/* Function that calculates the oblateness about the thrust axis.
 	 */
 
-	if (m_ndims < 3) return;
+	if (m_ndims < 3) {
+		// This function depends on the major thrust calculation
+		if (!m_thrust_major_axis) calcThrustMajor();
+		if (!m_thrust_major_axis) return;
 
-	// This function depends on the major and minor thrust calculations
-	if (!m_thrust_minor_axis) calcThrustMinor();
-	if (!m_thrust_minor_axis) return;
+		m_oblateness = m_thrust - m_thrust_major;
+	} else {
 
-	m_oblateness = m_thrust_major - m_thrust_minor;
+		// This function depends on the major and minor thrust calculations
+		if (!m_thrust_minor_axis) calcThrustMinor();
+		if (!m_thrust_minor_axis) return;
+
+		m_oblateness = m_thrust_major - m_thrust_minor;
+	}
 
 	return;
 }
