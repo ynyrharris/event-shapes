@@ -24,7 +24,7 @@ class EventShapes : public TObject {
 		void calcThrustAxis();
 		double calc_t(const std::vector<Eigen::Vector3f>&, const Eigen::Vector3f&);
 		const std::pair<Eigen::Vector3f, double> tradThrust(const std::vector<Eigen::Vector3f>&);
-		std::pair<Eigen::Vector3f, double> pythiaThrust(const std::vector<Eigen::Vector3f>&);
+		std::pair<Eigen::Vector3f, double> pythiaThrust(const std::vector<Eigen::Vector3f>&, bool thrust_major=false);
 		void calcThrust();
 		void calcThrustMajor();
 		void calcThrustMinor();

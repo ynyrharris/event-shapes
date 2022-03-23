@@ -8,6 +8,10 @@
 
 using namespace Eigen;
 
+// The numerical precision to forgive
+float epsilon = std::numeric_limits<float>::epsilon();
+float big_epsilon = 5e2 * epsilon;
+
 
 EventShapes::EventShapes()
 	: m_ndims(2),
@@ -121,13 +125,11 @@ const std::pair<Vector3f, double> EventShapes::tradThrust(const std::vector<Vect
 		}
 	}
 
-	std::cout << "Thrust axis: " << axis << std::endl;
-
 	return std::pair<Vector3f, double> (axis, axis_t);
 }
 
 
-std::pair<Vector3f, double> EventShapes::pythiaThrust(const std::vector<Vector3f>& X) {
+std::pair<Vector3f, double> EventShapes::pythiaThrust(const std::vector<Vector3f>& X, bool thrust_major) {
 	/*
 	 Calculate the thrust axis using the method of the Pythia 6.4 manual.
 	 https://arxiv.org/pdf/hep-ph/0603175.pdf
@@ -154,21 +156,28 @@ std::pair<Vector3f, double> EventShapes::pythiaThrust(const std::vector<Vector3f
 	// Number of starting axes
 	unsigned int n = 4;
 
+	Vector3f z;
+	if (thrust_major) z = *m_thrust_axis;
+
 	for (unsigned int i = 0; i < n; i++) {
 
 		// Iterate to the closest maximum thrust axis
 		double delta = 999.;
-		double epsilon = 1e-5;
 		Vector3f n0 = Y[i];
 		Vector3f nj = n0.normalized();
 
-		while (delta > std::numeric_limits<float>::epsilon()) {
+		while (delta > epsilon) {
 
 			Vector3f v = Vector3f::Zero();
 			for (const auto& y : Y) {
 				nj.dot(y) > 0. ? v += y : v -= y;
 			}
+
+			// Pull the vector back into the plane in the thrust major case
+			if (thrust_major) v -= v.dot(z) * z;
+
 			v.normalize();
+
 			delta = (v - nj).norm();
 			nj = v;
 		}
@@ -189,6 +198,12 @@ void EventShapes::calcThrust() {
 	/* Function that calculates the thrust proper axis and values.
 	 * The class member data are set with the calculated values.
 	 */
+
+	if (m_momenta.size() < m_min_ntracks) {
+		m_thrust_axis = nullptr;
+		m_thrust = -1;
+		return;
+	}
 
 	std::pair<Vector3f, double> pair = pythiaThrust(m_momenta);
 
@@ -229,11 +244,11 @@ void EventShapes::calcThrustMajor() {
 		std::vector<Vector3f> G;
 		G.reserve(m_momenta.size());
 
-		for (const auto& x : m_momenta) {
+		for (const Vector3f& x : m_momenta) {
 			G.push_back(x - x.dot(z) * z);
 		}
 
-		pair = tradThrust(G);
+		pair = pythiaThrust(G, true);
 	}
 
 	// Set class data members
@@ -243,6 +258,14 @@ void EventShapes::calcThrustMajor() {
 	} else {
 		m_thrust_major_axis = new Vector3f(pair.first);
 		m_thrust_major = pair.second;
+	}
+
+	// Sanity check
+	float a_dot_b = fabs(z.dot(pair.first));
+	if (a_dot_b > big_epsilon) {
+		std::cout << "Thrust axes not orthogonal!" << std::endl;
+		std::cout << "ndims: " << m_ndims << std::endl;
+		std::cout << "a_dot_b: " << a_dot_b << std::endl;
 	}
 
 	return;
@@ -271,10 +294,11 @@ void EventShapes::calcThrustMinor() {
 	// Sanity check
 	float a_dot_b = fabs(thrust_axis.dot(thrust_major_axis));
 	float b_dot_c = fabs(thrust_axis.dot(thrust_minor_axis));
-	float epsilon = 1e2 * std::numeric_limits<float>::epsilon();
+	// float epsilon = 1e2 * std::numeric_limits<float>::epsilon();
 
-	if (a_dot_b > epsilon || b_dot_c > epsilon) {
+	if (a_dot_b > big_epsilon || b_dot_c > big_epsilon) {
 		std::cout << "Thrust axes not orthogonal!" << std::endl;
+		std::cout << "ndims: " << m_ndims << std::endl;
 		std::cout << "a_dot_b: " << a_dot_b << std::endl;
 		std::cout << "b_dot_c: " << b_dot_c << std::endl;
 		std::cout << "epsilon: " << epsilon << std::endl;
@@ -319,7 +343,7 @@ void EventShapes::calcBrd() {
 	double Bd = 0., Bd_norm = 0.;
 
 	for (const auto& x : m_momenta) {
-		if (axis.dot(x) > std::numeric_limits<float>::epsilon()) {
+		if (axis.dot(x) > epsilon) {
 			Bu += x.cross(axis).norm();
 			Bu_norm += x.norm();
 		} else {
