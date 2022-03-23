@@ -6,6 +6,44 @@ This README documents the details of the Event Shape calculations performed by t
 Contact [ynyr.harris@physics.ox.ac.uk](mailto:ynyr.harris@physics.ox.ac.uk) with queries.
 
 
+## Setup
+
+Do this in an environment that has ROOT 6 and Python 3 installed.  On a machine connected to cvmfs, you can use an LCG view to this end
+```bash
+source /cvmfs/sft.cern.ch/lcg/views/setupView.sh LCG_98python3 x86_64-centos7-gcc8-opt
+```
+
+Acquire the repository and build the project.
+```bash
+git clone <repo url>
+```
+
+This repository is intended as a subproject.  To incorporate it into your main project, add a line like `add_subdirectory(event-shapes)` to your top-level CMakeLists.txt, supposing that your project is laid out as
+```
+- build/
+- run/
+- src/
+  - CMakeLists.txt
+  - event-shapes/
+  - <other packages>/
+```
+
+### Building for Python
+```bash
+cd build
+cmake [-DPYTHON_SETUP=1] ../src # -DPYTHON_SETUP=1 is the default
+make -j
+make install
+```
+
+### Building for C++
+```bash
+cd build
+cmake -DCXX_SETUP=1 ../src
+make -j
+```
+
+
 ## Introduction
 
 Event Shape measures are intended to give a global view of an event.
